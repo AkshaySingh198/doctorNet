@@ -7,9 +7,15 @@ const multer = require('multer');
 const path = require('path');
 
 // Configure multer for file uploads
+// Resolve base uploads directory from env, defaulting to project public/uploads
+const uploadBasePath = process.env.UPLOAD_PATH
+    ? path.resolve(process.cwd(), process.env.UPLOAD_PATH)
+    : path.join(__dirname, '..', 'public', 'uploads');
+const prescriptionsPath = path.join(uploadBasePath, 'prescriptions');
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'public/uploads/prescriptions/');
+        cb(null, prescriptionsPath);
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname);
