@@ -25,6 +25,6 @@ services:
     healthCheckPath: /
     disk:
       name: uploads
-      mountPath: ./public/uploads
+      mountPath: /opt/render/project/src/public/uploads
       sizeGB: 1
 
