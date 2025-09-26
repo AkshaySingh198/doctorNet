@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: doctorNet
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
+      - key: UPLOAD_PATH
+        value: public/uploads
+    headers:
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+    healthCheckPath: /
+    disk:
+      name: uploads
+      mountPath: ./public/uploads
+      sizeGB: 1
+

@@ -1,0 +1,61 @@
+<% layout('layout') -%>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Chat with Doctor</h5>
+                    <a href="/patient/home" class="btn btn-light btn-sm">Back to Home</a>
+                </div>
+                <div class="card-body">
+                    <div id="chatMessages" class="border rounded p-3 mb-3" style="height: 400px; overflow-y: auto; background: #fff;">
+                        <!-- Messages -->
+                    </div>
+                    <div class="input-group" style="display: flex; gap: 5px;">
+                        <input type="text" class="form-control" id="chatInput" placeholder="Type your message and press Enter...">
+                        <button class="btn btn-primary" id="sendMessage">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    const messagesEl = document.getElementById('chatMessages');
+    const inputEl = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendMessage');
+
+    function appendMessage({ name, message, timestamp }) {
+        const time = new Date(timestamp || Date.now());
+        const item = document.createElement('div');
+        item.className = 'mb-2';
+        item.innerHTML = `<strong>${name || 'User'}:</strong> ${message} <small class="text-muted">${time.toLocaleTimeString()}</small>`;
+        messagesEl.appendChild(item);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    inputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    function sendMessage() {
+        const text = inputEl.value.trim();
+        if (!text) return;
+        const payload = { name: '<%= patient.name %>', message: text, timestamp: Date.now() };
+        socket.emit('chatMessage', payload);
+        inputEl.value = '';
+    }
+
+    socket.on('chatMessage', (payload) => {
+        appendMessage(payload);
+    });
+</script>

@@ -1,0 +1,414 @@
+<% layout('layout') -%>
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Welcome,  <%= doctor.name %>!</h2>
+                    <p class="text-muted mb-0">Manage your patients and appointments</p>
+                </div>
+                <div>
+                    <a href="/doctor/logout" class="btn btn-outline-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Doctor Profile -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>Doctor Profile</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="feature-icon mx-auto mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <h5 class="fw-bold"><%= doctor.name %></h5>
+                        <p class="text-muted"><%= doctor.specialization %></p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong><i class="fas fa-id-badge me-2 text-primary"></i>UID:</strong>
+                        <span class="text-muted"><%= doctor.uid %></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong><i class="fas fa-briefcase me-2 text-primary"></i>Experience:</strong>
+                        <span class="text-muted"><%= doctor.yearsOfExperience %> years</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong><i class="fas fa-phone me-2 text-primary"></i>Phone:</strong>
+                        <span class="text-muted"><%= doctor.phoneNumber %></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong><i class="fas fa-calendar-alt me-2 text-primary"></i>Age:</strong>
+                        <span class="text-muted"><%= doctor.age %> years</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong><i class="fas fa-venus-mars me-2 text-primary"></i>Gender:</strong>
+                        <span class="text-muted"><%= doctor.gender %></span>
+                    </div>
+                    
+                    <button class="btn btn-outline-primary btn-sm w-100" onclick="showScheduleModal()">
+                        <i class="fas fa-calendar me-2"></i>Manage Schedule
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-grid">
+                                <button class="btn btn-outline-primary btn-lg" onclick="showPrescriptionModal()">
+                                    <i class="fas fa-prescription me-2"></i>
+                                    Write Prescription
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-grid">
+                                <button class="btn btn-outline-success btn-lg" onclick="showPatientModal()">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Add Patient
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-grid">
+                                <a href="/doctor/video-call" class="btn btn-outline-info btn-lg">
+                                    <i class="fas fa-video me-2"></i>
+                                    Start Video Call
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-grid">
+                                <button class="btn btn-outline-warning btn-lg">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    View Analytics
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Patients -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>Current Patients</h5>
+                </div>
+                <div class="card-body">
+                    <% if (doctor.patients && doctor.patients.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Patient Name</th>
+                                        <th>Appointment Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% doctor.patients.forEach(function(patient) { %>
+                                        <tr>
+                                            <td><%= patient.patientName %></td>
+                                            <td><%= new Date(patient.appointmentDate).toLocaleDateString() %></td>
+                                            <td>
+                                                <span class="badge bg-<%= patient.status === 'Active' ? 'success' : patient.status === 'Completed' ? 'primary' : 'danger' %>">
+                                                    <%= patient.status %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-outline-primary btn-sm me-2" onclick="viewPatient('<%= patient.patientId %>')">
+                                                    <i class="fas fa-eye me-1"></i>View
+                                                </button>
+                                                <button class="btn btn-outline-success btn-sm" onclick="writePrescription('<%= patient.patientId %>', '<%= patient.patientName %>')">
+                                                    <i class="fas fa-prescription me-1"></i>Prescribe
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="text-center py-4">
+                            <i class="fas fa-users text-muted" style="font-size: 48px;"></i>
+                            <p class="text-muted mt-3">No patients assigned yet</p>
+                            <p class="text-muted">Patients will appear here when they book appointments with you</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Digital Prescriptions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-prescription-bottle-alt me-2"></i>Digital Prescriptions</h5>
+                </div>
+                <div class="card-body">
+                    <% if (doctor.digitalPrescriptions && doctor.digitalPrescriptions.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Patient Name</th>
+                                        <th>Prescription</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% doctor.digitalPrescriptions.forEach(function(prescription) { %>
+                                        <tr>
+                                            <td><%= prescription.patientName %></td>
+                                            <td>
+                                                <div class="prescription-preview">
+                                                    <%= prescription.prescription.length > 100 ? prescription.prescription.substring(0, 100) + '...' : prescription.prescription %>
+                                                </div>
+                                            </td>
+                                            <td><%= new Date(prescription.date).toLocaleDateString() %></td>
+                                            <td>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="viewPrescription('<%= prescription._id %>')">
+                                                    <i class="fas fa-eye me-1"></i>View Full
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="text-center py-4">
+                            <i class="fas fa-prescription-bottle-alt text-muted" style="font-size: 48px;"></i>
+                            <p class="text-muted mt-3">No prescriptions written yet</p>
+                            <p class="text-muted">Start writing prescriptions for your patients</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Write Prescription Modal -->
+<div class="modal fade" id="prescriptionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-prescription me-2"></i>Write Digital Prescription</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="prescriptionForm">
+                    <input type="hidden" id="selectedPatientId" name="patientId">
+                    <div class="mb-3">
+                        <label class="form-label">Patient</label>
+                        <input type="text" class="form-control" id="selectedPatientName" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="prescription" class="form-label">Prescription Details</label>
+                        <textarea class="form-control" id="prescription" name="prescription" rows="10" placeholder="Enter prescription details including medications, dosage, instructions, etc..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="savePrescription()">Save Prescription</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Management Modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-calendar me-2"></i>Manage Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Monday</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Start Time</label>
+                                        <input type="time" class="form-control" name="mondayStart" value="09:00">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">End Time</label>
+                                        <input type="time" class="form-control" name="mondayEnd" value="17:00">
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="mondayAvailable" checked>
+                                        <label class="form-check-label">Available</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Tuesday</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Start Time</label>
+                                        <input type="time" class="form-control" name="tuesdayStart" value="09:00">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">End Time</label>
+                                        <input type="time" class="form-control" name="tuesdayEnd" value="17:00">
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="tuesdayAvailable" checked>
+                                        <label class="form-check-label">Available</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Add more days as needed -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveSchedule()">Save Schedule</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Prescription Modal -->
+<div class="modal fade" id="viewPrescriptionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-prescription me-2"></i>Prescription Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="prescriptionContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showPrescriptionModal() {
+    new bootstrap.Modal(document.getElementById('prescriptionModal')).show();
+}
+
+function showScheduleModal() {
+    new bootstrap.Modal(document.getElementById('scheduleModal')).show();
+}
+
+function writePrescription(patientId, patientName) {
+    document.getElementById('selectedPatientId').value = patientId;
+    document.getElementById('selectedPatientName').value = patientName;
+    new bootstrap.Modal(document.getElementById('prescriptionModal')).show();
+}
+
+function savePrescription() {
+    const formData = new FormData(document.getElementById('prescriptionForm'));
+    
+    fetch('/doctor/write-prescription', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('prescriptionModal')).hide();
+            alert('Prescription saved successfully!');
+            location.reload();
+        } else {
+            alert('Failed to save prescription');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to save prescription');
+    });
+}
+
+function saveSchedule() {
+    const scheduleData = {
+        schedule: [
+            {
+                day: 'Monday',
+                startTime: document.querySelector('input[name="mondayStart"]').value,
+                endTime: document.querySelector('input[name="mondayEnd"]').value,
+                isAvailable: document.querySelector('input[name="mondayAvailable"]').checked
+            },
+            {
+                day: 'Tuesday',
+                startTime: document.querySelector('input[name="tuesdayStart"]').value,
+                endTime: document.querySelector('input[name="tuesdayEnd"]').value,
+                isAvailable: document.querySelector('input[name="tuesdayAvailable"]').checked
+            }
+        ]
+    };
+    
+    fetch('/doctor/update-schedule', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scheduleData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('scheduleModal')).hide();
+            alert('Schedule updated successfully!');
+        } else {
+            alert('Failed to update schedule');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update schedule');
+    });
+}
+
+function viewPrescription(prescriptionId) {
+    // This would typically fetch the full prescription from the server
+    // For now, we'll show a placeholder
+    document.getElementById('prescriptionContent').innerHTML = '<p>Prescription details would be loaded here...</p>';
+    new bootstrap.Modal(document.getElementById('viewPrescriptionModal')).show();
+}
+
+function viewPatient(patientId) {
+    // This would typically redirect to a patient details page
+    alert('Patient details would be shown here for patient ID: ' + patientId);
+}
+</script>
