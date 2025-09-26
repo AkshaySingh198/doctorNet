@@ -56,23 +56,28 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 //app.use(expressLayouts);
 
-// Session configuration (use Mongo-backed store in all envs)
-app.use(session({
+// Session configuration: prefer Mongo-backed store when MONGODB_URI is set
+const sessionOptions = {
     secret: process.env.SESSION_SECRET || 'telemedicine-secret-key',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: mongoUri,
-        collectionName: 'sessions',
-        ttl: 60 * 60 * 24 * 7 // 7 days
-    }),
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+        sameSite: 'lax',
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
-}));
+};
+
+if (process.env.MONGODB_URI) {
+    sessionOptions.store = MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        collectionName: 'sessions',
+        ttl: 60 * 60 * 24 * 7
+    });
+}
+
+app.use(session(sessionOptions));
 
 app.use(flash());
 
