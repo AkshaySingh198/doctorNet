@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const path = require('path');
 const fs = require('fs');
@@ -55,15 +56,20 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 //app.use(expressLayouts);
 
-// Session configuration
+// Session configuration (use Mongo-backed store in all envs)
 app.use(session({
     secret: process.env.SESSION_SECRET || 'telemedicine-secret-key',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: mongoUri,
+        collectionName: 'sessions',
+        ttl: 60 * 60 * 24 * 7 // 7 days
+    }),
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }));
