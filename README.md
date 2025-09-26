@@ -92,8 +92,8 @@ telemedicine-website/
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd telemedicine-website
+   git clone https://github.com/AkshaySingh198/doctorNet.git
+   cd doctorNet
    ```
 
 2. **Install dependencies**
@@ -127,6 +127,59 @@ telemedicine-website/
 
 6. **Access the application**
    Open your browser and navigate to `http://localhost:3000`
+
+## 🌐 Deployment
+
+### Deploy to Render (Recommended)
+
+1. **Fork this repository** to your GitHub account
+2. **Sign up for Render** at [render.com](https://render.com)
+3. **Connect your GitHub account** to Render
+4. **Create a new Web Service** in Render
+5. **Configure the service:**
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+   - **Environment:** Node
+6. **Set up environment variables:**
+   - `NODE_ENV`: `production`
+   - `SESSION_SECRET`: Generate a random string
+   - `MONGODB_URI`: Your MongoDB connection string
+   - `UPLOAD_PATH`: `public/uploads`
+7. **Deploy!** Render will automatically deploy your app
+
+### Deploy to Heroku
+
+1. **Install Heroku CLI**
+2. **Login to Heroku:**
+   ```bash
+   heroku login
+   ```
+3. **Create Heroku app:**
+   ```bash
+   heroku create your-app-name
+   ```
+4. **Set environment variables:**
+   ```bash
+   heroku config:set NODE_ENV=production
+   heroku config:set SESSION_SECRET=your-secret-key
+   heroku config:set MONGODB_URI=your-mongodb-uri
+   ```
+5. **Deploy:**
+   ```bash
+   git push heroku main
+   ```
+
+### Deploy to Vercel
+
+1. **Install Vercel CLI:**
+   ```bash
+   npm i -g vercel
+   ```
+2. **Deploy:**
+   ```bash
+   vercel
+   ```
+3. **Set environment variables** in Vercel dashboard
 
 ## 🎨 UI/UX Design
 
